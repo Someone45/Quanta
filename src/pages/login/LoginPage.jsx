@@ -48,7 +48,7 @@ const LoginPage = () => {
     event.preventDefault();
     console.log("Token submitted:", token);
 
-    fetch("/login", {
+    fetch("http://127.0.0.1:5000/login", {
         method: "POST", // Specify the HTTP method
         headers: {
             "Content-Type": "application/json", // Specify content type

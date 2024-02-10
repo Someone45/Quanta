@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 import json
 from io import BytesIO
@@ -10,6 +11,8 @@ from PIL import Image
 load_dotenv()
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 LABS_TOKEN = os.getenv('LABS_TOKEN')
 
@@ -221,6 +224,18 @@ def get_server_icon(guild_id, icon_id, size=256):
 
     except Exception as e:
         print(e)
+
+@app.route("/echo", methods=["GET", "POST"])
+def echo():
+    print(request)
+    print("ABC")
+    return request.get_data()
+
+@app.route("/echo", methods=["GET", "POST"])
+def echo():
+    print(request)
+    print("ABC")
+    return request.get_data()
 
 if __name__ == '__main__':
     app.run()
