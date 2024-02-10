@@ -185,7 +185,17 @@ def generate_voice_audio(voice_id, text):
         return base64_audio
     else:
         return ""
+@app.route('/login',  methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        key = request.get_json('key')
+        if (verify_token(key)):
+            pass
+        else:
+            return jsonify({'error': 'Non-Existent Token'}), 400
 
-
+    except Exception as e:
+        print(e)
 if __name__ == '__main__':
     app.run()
