@@ -47,6 +47,7 @@ const LoginPage = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log("Token submitted:", token);
+
     };
 
     return (
