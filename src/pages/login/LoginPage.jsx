@@ -87,6 +87,9 @@ const LoginPage = () => {
     return (
         <div className="login-page">
             <img src={logo} alt="Logo" className="logo" />
+            {/*<div className="diagonal-text">*/}
+            {/*    <span className="diagonal-span">Better TTS on your favorite platform!</span>*/}
+            {/*</div>**/}
             <h1 className="siteTitle">Quanta</h1>
             <div className="token-entry" onSubmit={handleSubmit}>
                 <CustomTextField

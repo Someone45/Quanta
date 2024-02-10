@@ -68,3 +68,13 @@
 .login-form button:hover {
     background-color: white;
 }
+
+.diagonal-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-9%, -400%) rotate(33deg); /* Rotate the text */
+    color: #00032d; /* Text color */
+    font-size: 24px; /* Font size */
+    font-weight: bold; /* Font weight */
+}

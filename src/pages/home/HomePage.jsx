@@ -3,6 +3,7 @@ import { styled, createTheme, ThemeProvider} from '@mui/material/styles';
 import { Avatar, Box, Button, FormControl, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel } from '@mui/material';
 import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import logo from './Quanta.svg'
 
 // Dark theme configuration
 const theme = createTheme({
@@ -105,6 +106,14 @@ const Separator = styled(Box)(({ theme }) => ({
     backgroundColor: 'transparent', // Make it transparent
 }));
 
+const LogoImage = styled('img')({
+    position: 'fixed',
+    bottom: '10px',
+    left: '10px',
+    width: '100px',
+    height: 'auto',
+});
+
 export default function NewPage() {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [activeTab, setActiveTab] = useState(0);
@@ -144,6 +153,7 @@ export default function NewPage() {
     return (
         <ThemeProvider theme={theme}>
         <PageContainer>
+        <LogoImage src={logo} alt="Logo" />
             <ProfileSection>
                 <Avatar sx={{ width: 56, height: 56, marginBottom: 2 }}>U</Avatar>
                 <Typography variant="h6">userID</Typography>
@@ -158,6 +168,7 @@ export default function NewPage() {
                             // onChange={handleServerChange} // Use handler
                         >
                             {/* We set a map to add the items */}
+                            {/*for (let index = 0; index <*/}
                             <MenuItem value={1}>Server 1</MenuItem>
                             <MenuItem value={2}>Server 2</MenuItem>
                         </Select>
@@ -267,3 +278,4 @@ export default function NewPage() {
         </ThemeProvider>
     );
 }
+

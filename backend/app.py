@@ -196,6 +196,10 @@ def login():
         data = request.get_json()
         token = data['token']
         if (verify_token(token)):
+
+            res = make_response(redirect("http://127.0.0.1:5173/home"))
+            res.set_cookie("token", token)
+            return res
             return redirect("http://127.0.0.1:5173/home")
         else:
             return jsonify({'error': 'Non-Existent Token'}), 400
@@ -205,13 +209,13 @@ def login():
         return "Error", 500
 
 def verify_token(token: str) -> bool:
-    return requests.get('https://discordapp.com/api/users/@me/guilds', headers={"Authorization": f"{token}"}).ok
-
+    return  requests.get('https://discordapp.com/api/users/@me/guilds', headers={"Authorization": f"{token}"}).ok
 @app.route('/get_server_icons,', methods = ['POST'])
-def get_server_icon(guild_id, icon_id, size=256):
+def get_server_icon(size=256):
     try:
         data = request.get_json()
         guild_id = data.get('guild_id')
+        icon_id = data.get('icon_id')
 
         if not guild_id:
             return jsonify({"error": "Guild_ID is required"}), 400
