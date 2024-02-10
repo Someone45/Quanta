@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import './LoginPage.css';
 import logo from './Quanta.svg'
+import Cookies from 'universal-cookie';
 
 // Custom styled TextField
 const CustomTextField = styled(TextField)({
@@ -56,7 +57,7 @@ const LoginPage = () => {
     event.preventDefault();
     console.log("Token submitted:", token);
 
-    await fetch("http://127.0.0.1:5000/login", {
+    fetch("http://127.0.0.1:5000/login", {
         method: "POST", // Specify the HTTP method
         headers: {
             "Content-Type": "application/json", // Specify content type
@@ -66,6 +67,8 @@ const LoginPage = () => {
     })
     .then(response => {
         if (response.ok) {
+            const cookies = new Cookies(null, { path: '/' });
+            cookies.set('token', token);
             window.location.href = "http://127.0.0.1:5173/home";
             // Response is OK
             console.log("Login successful");

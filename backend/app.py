@@ -196,9 +196,7 @@ def login():
         data = request.get_json()
         token = data['token']
         if (verify_token(token)):
-            res = make_response(redirect("http://127.0.0.1:5173/home"))
-            res.set_cookie("token", token)
-            return res
+            return redirect("http://127.0.0.1:5173/home")
         else:
             return jsonify({'error': 'Non-Existent Token'}), 400
 
