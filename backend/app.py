@@ -5,6 +5,7 @@ from io import BytesIO
 import base64
 from dotenv import load_dotenv
 import os
+from PIL import Image
 
 load_dotenv()
 
@@ -201,6 +202,25 @@ def login():
 def verify_token(token: str) -> bool:
     return requests.get('https://discordapp.com/api/users/@me/guilds', headers={"Authorization": f"{token}"}).ok
 
+@app.route('/get_server_icons,', methods = ['POST'])
+def get_server_icon(guild_id, icon_id, size=256):
+    try:
+        data = request.get_json()
+        guild_id = data.get('guild_id')
+
+        if not guild_id:
+            return jsonify({"error": "Guild_ID is required"}), 400
+
+        else:
+            image = requests.get(f' \
+                                https://cdn.discordapp.com/icons/{guild_id}/{icon_id}.webp?size={size}')
+            image_data = image.content
+            image_stream = BytesIO(image_data)
+            image = Image.open(image_stream)
+            return image
+
+    except Exception as e:
+        print(e)
 
 if __name__ == '__main__':
     app.run()
