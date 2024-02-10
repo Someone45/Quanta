@@ -225,17 +225,6 @@ def get_server_icon(guild_id, icon_id, size=256):
     except Exception as e:
         print(e)
 
-@app.route("/echo", methods=["GET", "POST"])
-def echo():
-    print(request)
-    print("ABC")
-    return request.get_data()
-
-@app.route("/echo", methods=["GET", "POST"])
-def echo():
-    print(request)
-    print("ABC")
-    return request.get_data()
 
 if __name__ == '__main__':
     app.run()
