@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import './LoginPage.css';
+import logo from './Quanta.svg'
 
 // Custom styled TextField
 const CustomTextField = styled(TextField)({
@@ -40,7 +41,14 @@ const CustomButton = styled(Button)({
         backgroundColor: '#d3d3d3', // Hover background color
     }
 });
-
+function MyComponent() {
+  return (
+    <div>
+      <h1>My Component with SVG Logo</h1>
+      <img src={logo} alt="Logo" />
+    </div>
+  );
+}
 const LoginPage = () => {
     const [token, setToken] = useState('');
 
@@ -73,6 +81,7 @@ const LoginPage = () => {
 
     return (
         <div className="login-page">
+            <img src={logo} alt="Logo" className="logo" />
             <h1 className="siteTitle">Quanta</h1>
             <div className="token-entry" onSubmit={handleSubmit}>
                 <CustomTextField
@@ -94,3 +103,5 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+export {MyComponent};
+
