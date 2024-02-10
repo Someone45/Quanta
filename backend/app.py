@@ -5,8 +5,6 @@ from io import BytesIO
 import base64
 from dotenv import load_dotenv
 import os
-from PIL import Image
-
 
 load_dotenv()
 
@@ -188,31 +186,6 @@ def generate_voice_audio(voice_id, text):
     else:
         return ""
 
-def get_server_icons(guild_id, icon_id, size = 256):
-    try:
-        """
-        Adriel knows how this actually works so I leave this as a template for him
-        
-        data = request.get_json()
-        guild_id = data.get('guild_id')
-        """
-
-
-        if not guild_id:
-            return jsonify({"error": "Guild_ID is required"}), 400
-
-        else:
-            image = requests.get(f' \
-                                https://cdn.discordapp.com/icons/{guild_id}/{icon_id}.webp?size={size}')
-            image_data = image.content
-            image_stream = BytesIO(image_data)
-            image = Image.open(image_stream)
-            image.save("test.jpg")
-            print(image)
-    except Exception as e:
-        print(e)
-
 
 if __name__ == '__main__':
-    #app.run()
-    get_server_icons('239107461015928835', '2c5776ce26bedd5cb192e87c182d0275')
+    app.run()
