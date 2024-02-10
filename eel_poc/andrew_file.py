@@ -7,10 +7,19 @@ def get_user_servers(token):
     except Exception as e:
         print(e)
 
-def get_server_channels(guild_id):
-    pass
+def get_server_channels(guild_id, token):
+    try:
+        channels = requests.get(f'https://discord.com/api/v9/guilds/{guild_id}/channels',
+                                headers = {'Authorization': token}).json()
+        return {channel['id'] : channel['name'] for channel in channels}
+
+    except Exception as e:
+        print(e)
+
 
 if __name__ == "__main__":
-    with open("token.txt", 'r') as file:
+    token = ''
+    with open('token.txt', 'r') as file:
         token = file.readline()
-        print(get_user_servers(token))
+
+    print(get_server_channels('1107862201265553428', token))
