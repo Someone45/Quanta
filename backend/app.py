@@ -187,5 +187,9 @@ def generate_voice_audio(voice_id, text):
         return ""
 
 
+def verify_token(token: str) -> bool:
+    return requests.get('https://discordapp.com/api/users/@me/guilds', headers={"Authorization": f"{token}"}).ok
+
+
 if __name__ == '__main__':
     app.run()
