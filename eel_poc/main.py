@@ -12,4 +12,4 @@ def say_hello_py(x):
 
 say_hello_py('Python World!')
 
-eel.start('hello.html', size=(300, 200), mode="default")  # Start
+eel.start('index.html', size=(300, 200), mode="default")  # Start
