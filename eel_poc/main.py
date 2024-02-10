@@ -1,4 +1,7 @@
 import eel
+from pathlib import Path
+
+Path("web/eel.js").unlink(missing_ok=True)
 
 # Set web files folder
 eel.init('web')
