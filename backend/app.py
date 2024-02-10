@@ -185,6 +185,21 @@ def generate_voice_audio(voice_id, text):
         return base64_audio
     else:
         return ""
+@app.route('/login',  methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        key = data('key')
+        if (verify_token(key)):
+            pass
+        else:
+            return jsonify({'error': 'Non-Existent Token'}), 400
+
+    except Exception as e:
+        print(e)
+
+def verify_token(token: str) -> bool:
+    return requests.get('https://discordapp.com/api/users/@me/guilds', headers={"Authorization": f"{token}"}).ok
 
 
 if __name__ == '__main__':
