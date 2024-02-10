@@ -45,10 +45,31 @@ const LoginPage = () => {
     const [token, setToken] = useState('');
 
     const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log("Token submitted:", token);
+    event.preventDefault();
+    console.log("Token submitted:", token);
 
-    };
+    fetch("/login", {
+        method: "POST", // Specify the HTTP method
+        headers: {
+            "Content-Type": "application/json", // Specify content type
+        },
+        body: JSON.stringify({ token }), // Convert data to JSON string
+    })
+    .then(response => {
+        if (response.ok) {
+            // Response is OK
+            console.log("Login successful");
+        } else {
+            // Handle error response
+            console.error("Login failed");
+        }
+    })
+    .catch(error => {
+        // Handle network errors
+        console.error("Network error:", error);
+    });
+};
+
 
     return (
         <div className="login-page">
