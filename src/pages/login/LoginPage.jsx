@@ -52,11 +52,11 @@ function MyComponent() {
 const LoginPage = () => {
     const [token, setToken] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
     event.preventDefault();
     console.log("Token submitted:", token);
 
-    fetch("http://127.0.0.1:5000/login", {
+    await fetch("http://127.0.0.1:5000/login", {
         method: "POST", // Specify the HTTP method
         headers: {
             "Content-Type": "application/json", // Specify content type
