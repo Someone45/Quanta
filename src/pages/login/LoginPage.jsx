@@ -61,10 +61,12 @@ const LoginPage = () => {
         headers: {
             "Content-Type": "application/json", // Specify content type
         },
+        // redirect: "follow",
         body: JSON.stringify({ token }), // Convert data to JSON string
     })
     .then(response => {
         if (response.ok) {
+            window.location.href = "http://127.0.0.1:5173/home";
             // Response is OK
             console.log("Login successful");
         } else {
