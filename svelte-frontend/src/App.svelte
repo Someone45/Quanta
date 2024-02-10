@@ -2,11 +2,21 @@
   import svelteLogo from './assets/svelte.svg'
   import viteLogo from '/vite.svg'
   import Counter from './lib/Counter.svelte'
+  import { onMount } from 'svelte';
   let eel = window.eel;
 
   function handleClick() {
     console.log("test");
     eel.say_hello_py('Running Python from JS');
+  }
+
+  onMount(() => {
+    eel.expose(my_javascript_function, "my_javascript_function");
+    my_javascript_function("abc");
+  });
+  function my_javascript_function(a: string): string {
+    console.log(a);
+    return `${a} from js`;
   }
 </script>
 
