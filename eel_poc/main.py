@@ -11,5 +11,6 @@ def say_hello_py(x):
     print('Hello from %s' % x)
 
 say_hello_py('Python World!')
+eel.my_javascript_function("Python text")(print)
 
 eel.start('index.html', size=(300, 200), mode="default")  # Start
