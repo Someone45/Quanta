@@ -189,7 +189,7 @@ def generate_voice_audio(voice_id, text):
 def login():
     try:
         data = request.get_json()
-        key = request.get_json('key')
+        key = data('key')
         if (verify_token(key)):
             pass
         else:
