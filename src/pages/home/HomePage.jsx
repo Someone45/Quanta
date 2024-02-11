@@ -30,7 +30,19 @@ const MessageLog = styled(Box)(({ theme }) => ({
     minHeight: '150px', // Minimum height to enable scrolling
     padding: theme.spacing(2), // Add padding for better appearance
     overflowY: 'auto', // Enable vertical scrolling
+    position: 'relative', // Position relative to contain the absolute-positioned white box
 }));
+
+const WhiteBox = styled(Box)({
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#FFFFFF',
+    opacity: 0.3, // Adjust the opacity as needed
+    zIndex: 1, // Ensure it's on top of the message log content
+});
 
 // Custom styled components adapted for dark mode
 const CustomFormControl = styled(FormControl)(({ theme }) => ({
@@ -249,13 +261,14 @@ export default function NewPage() {
             </FormSection>
             <RightContainer>
             <ChatSection>
-                <CustomTabs value={0} aria-label="chat tabs">
-                    <Tab label="Chat Logs" />
-                </CustomTabs>
-                <MessageLog>
+            <CustomTabs value={0} aria-label="chat tabs">
+                <Tab label="Chat Logs" />
+            </CustomTabs>
+            <MessageLog>
+                <WhiteBox /> {/* White box to overlay the message log */}
                 {/* Add your incoming messages here */}
-                </MessageLog>
-                {/* We populate this with discord */}
+            </MessageLog>
+            {/* We populate this with discord */}
             </ChatSection>
             <Separator />
                 <UploadSection>
@@ -273,13 +286,23 @@ export default function NewPage() {
                             />
                             <List>
                                 {selectedFiles.map((file, index) => (
-                                    <ListItem key={index} secondaryAction={
+                                    <ListItem
+                                    key={index}
+                                    sx={{
+                                        border: '1px solid #303030', // Add a border around the list item
+                                        borderRadius: '4px', // Add border radius for aesthetics
+                                        marginBottom: '8px', // Add some bottom margin for spacing
+                                        padding: '8px', // Add padding inside the list item
+                                    }}
+                                    secondaryAction={
                                         <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(index)}>
                                             <CloseIcon />
                                         </IconButton>
-                                    }>
-                                        {file.name}
-                                    </ListItem>
+                                    }
+                                >
+                                    {file.name}
+                                </ListItem>
+
                                 ))}
                             </List>
                         </Box>
