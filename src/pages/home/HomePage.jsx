@@ -24,7 +24,7 @@ const theme = createTheme({
 });
 
 const MessageLog = styled(Box)(({ theme }) => ({
-    backgroundColor: '#FFFFFF', // White background color
+    backgroundColor: '#808080', // White background color
     border: '0px solid #000000', // Tiny black borders
     borderRadius: '4px', // Rounded corners for aesthetics
     flexGrow: 1, // Allow the message log to expand to fill the available space
@@ -328,7 +328,7 @@ export default function NewPage() {
                 <Tab label="Chat Logs" />
             </CustomTabs>
             <MessageLog>
-                <WhiteBox /> {/* White box to overlay the message log */}
+
                 {/* Add your incoming messages here */}
             </MessageLog>
             {/* We populate this with discord */}
