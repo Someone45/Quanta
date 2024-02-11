@@ -210,6 +210,7 @@ export default function NewPage() {
             // Map channels and names
             const channels = Object.entries(data).map(([id, name]) => ({ id, name }));
             setChannels(channels);
+            setChannel(channels[0].id);
         }
         )
     }, [server])
@@ -392,6 +393,7 @@ export default function NewPage() {
                             // We have to set these up
                             value={channel} // Use state variable
                             onChange={handleChannelChange} // Use handler
+                            disabled={!server}
                         >
                             {channels.map((channel) => (
                                 <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
@@ -494,7 +496,7 @@ export default function NewPage() {
                                     onChange={handleFileChange}
                                     style={{ marginBottom: '16px', color: '#fff'  }}
                                     accept="audio/*"
-                                    name='files[]'                                />
+                                    name='files[]' />
                                 <List>
                                     {selectedFiles.map((file, index) => (
                                         <ListItem
