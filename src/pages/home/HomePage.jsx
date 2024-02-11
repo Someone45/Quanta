@@ -159,6 +159,8 @@ export default function NewPage() {
 
     const [userName, setUserName] = useState('')
     const [userPhoto, setUserPhoto] = useState('')
+    // const [cachedMessages, setCachedMessages] = useState({test: "test"})
+    const cachedMessages = useRef({"":""})
 
     useEffect(() => {
         const cookies = new Cookies();
@@ -222,11 +224,12 @@ export default function NewPage() {
                 setUserPhoto(data.avatar)
             })
             .catch(error => console.error('Error fetching guilds:', error));
-    })
+    }, [])
 
     const handleServerChange = (event) => {
         // console.log(event.target.value)?
         setServer(event.target.value);
+        setChannel('');
     };
 
 
@@ -251,8 +254,86 @@ export default function NewPage() {
     };
 
     const handleFilterEnabledChange = (event) => {
+        if (channel === '' || server === '') {
+            console.log('Please select a server and channel before enabling the message filter.')
+            alert('Please select a server and channel before enabling the message filter.');
+            setIsFilterEnabled(false);
+            return;
+        }
         setIsFilterEnabled(event.target.checked);
     };
+
+    // function base64toBlob(base64Data, contentType){
+    //     try {
+    //         contentType = contentType || "";
+    //         var sliceSize = 1024;
+    //         var byteCharacters = atob(base64Data);
+    //         var bytesLength = byteCharacters.length;
+    //         var slicesCount = Math.ceil(bytesLength / sliceSize);
+    //         var byteArrays = new Array(slicesCount);
+    //
+    //         for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+    //             var begin = sliceIndex * sliceSize;
+    //             var end = Math.min(begin + sliceSize, bytesLength);
+    //
+    //             var bytes = new Array(end - begin);
+    //             for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+    //                 bytes[i] = byteCharacters[offset].charCodeAt(0);
+    //             }
+    //             byteArrays[sliceIndex] = new Uint8Array(bytes);
+    //         }
+    //         return new Blob(byteArrays, { type: contentType });
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
+
+
+    useEffect(() => {
+        const fetchData = () => {
+            if (!isFilterEnabled) {
+                return; // Exit the recursion if the filter is not enabled
+            }
+
+            console.log("Fetching data")
+            // console.log(`Cached messages: ${JSON.stringify(cachedMessages.current)}`)
+
+            fetch('http://127.0.0.1:5000/scrape_for_new_messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: token.current, channel_id: channel, friend_ids: ["1097538072482160641"], cached_messages: cachedMessages.current }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    cachedMessages.current = data.cache
+
+                    const newMessages = data.audios;
+
+
+                    console.log(`New messages: ${newMessages}`)
+
+                    // Loop over messages
+                    newMessages.forEach((message) => {
+                        console.log('data:audio/mpeg;base64,' + message)
+                        const audio = new Audio(`data:audio/mpeg;base64,${message}`);
+                        audio.play();
+                        setTimeout(console.log("Hello"),100000)
+                    });
+
+                    console.log(`New messages: ${newMessages}`)
+                    setTimeout(fetchData, 1000); // Call fetchData again after a 1 second delay
+                })
+                .catch(error => {
+                    console.error('Error fetching guilds:', error);
+                    setTimeout(fetchData, 1000); // Attempt to fetch again after a 1 second delay even on error
+                });
+        };
+
+        fetchData(); // Initial call to start the process
+    }, [isFilterEnabled]); // Dependency array to re-run useEffect if isFilterEnabled changes
+
 
     const handleChannelChange = (event) => {
         setChannel(event.target.value);
