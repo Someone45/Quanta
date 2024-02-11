@@ -208,7 +208,9 @@ def login():
     try:
         data = request.get_json()
         token = data['token']
-        if (verify_token(token)):
+        vef_token = verify_token(token, "@me")
+        print(vef_token)
+        if (vef_token.ok):
 
             res = make_response(redirect("http://127.0.0.1:5173/home"))
             res.set_cookie("token", token)
@@ -221,9 +223,28 @@ def login():
         print(e)
         return "Error", 500
 
-def verify_token(token: str) -> bool:
-    return  requests.get('https://discordapp.com/api/users/@me/guilds', headers={"Authorization": f"{token}"}).ok
-@app.route('/get_server_icons,', methods = ['POST'])
+def verify_token(token: str, user: str):
+    return  requests.get(f'https://discordapp.com/api/users/{user}', headers={"Authorization": f"{token}"})
+
+@app.route('/get-my-info', methods=['POST'])
+def get_my_info():
+    try:
+        data = request.get_json()
+        token = data['token']
+        vef_token = verify_token(token, "@me")
+        username = vef_token.json()['username']
+        id = vef_token.json()['id']
+        avatar = vef_token.json()['avatar']
+        image_url = f'https://cdn.discordapp.com/avatars/{id}/{avatar}.webp?size=96'
+        if (vef_token.ok):
+            return jsonify({'username': username, 'avatar': image_url}), 200
+        else:
+            return jsonify({'error': 'Non-Existent Token'}), 400
+    except Exception as e:
+        print(e)
+        return "Error", 500
+
+@app.route('/get-server-icons,', methods = ['POST'])
 def get_server_icon(size=256):
     try:
         data = request.get_json()
@@ -246,4 +267,4 @@ def get_server_icon(size=256):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

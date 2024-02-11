@@ -1,10 +1,11 @@
 import React, {useRef} from 'react';
 import { styled, createTheme, ThemeProvider} from '@mui/material/styles';
-import { Avatar, Box, Button, FormControl, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel } from '@mui/material';
+import { Avatar, Box, Button, FormControl, TextField, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel } from '@mui/material';
 import { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import logo from './Quanta.svg'
 import Cookies from 'universal-cookie';
+import { Link } from 'react-router-dom';
 
 // Dark theme configuration
 const theme = createTheme({
@@ -24,7 +25,7 @@ const theme = createTheme({
 });
 
 const MessageLog = styled(Box)(({ theme }) => ({
-    backgroundColor: '#FFFFFF', // White background color
+    backgroundColor: '#00000', // White background color
     border: '0px solid #000000', // Tiny black borders
     borderRadius: '4px', // Rounded corners for aesthetics
     flexGrow: 1, // Allow the message log to expand to fill the available space
@@ -153,6 +154,9 @@ export default function NewPage() {
     const [channel, setChannel] = useState('');
     const token = useRef('')
 
+    const [userName, setUserName] = useState('')
+    const [userPhoto, setUserPhoto] = useState('')
+
     useEffect(() => {
         const cookies = new Cookies();
         token.current = cookies.get('token');
@@ -201,6 +205,22 @@ export default function NewPage() {
         )
     }, [server])
 
+    useEffect(() => {
+        fetch('http://127.0.0.1:5000/get-my-info', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token.current }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                setUserName(data.username)
+                setUserPhoto(data.avatar)
+            })
+            .catch(error => console.error('Error fetching guilds:', error));
+    })
+
     const handleServerChange = (event) => {
         // console.log(event.target.value)?
         setServer(event.target.value);
@@ -245,9 +265,13 @@ export default function NewPage() {
         <PageContainer>
         <LogoImage src={logo} alt="Logo" />
             <ProfileSection>
-                {/* U should be set to the userID photo*/}
-                <Avatar sx={{ width: 56, height: 56, marginBottom: 2 }}>U</Avatar>
-                <Typography variant="h6">userID</Typography>
+                <Link href={userPhoto} underline="none">
+                    <Avatar
+                        sx={{ width: 56, height: 56, marginBottom: 2 }}
+                        src={userPhoto}
+                        alt="Profile Picture" />
+                </Link>
+                <Typography variant="h6">{userName}</Typography>
             </ProfileSection>
             <FormSection>
                 <CustomFormControl>
@@ -276,17 +300,18 @@ export default function NewPage() {
                         </Select>
                     </CustomFormControl>
                     <CustomFormControl>
-                        <InputLabel>Target Friend</InputLabel>
-                        <Select
-                            label="Friend"
-                            // We have to set these up
-                            // value={channel} // Use state variable
-                            // onChange={handleChannelChange} // Use handler
-                        >
-                            {/* We set a map to add the items */}
-                            <MenuItem value={1}>Friend 1</MenuItem>
-                            <MenuItem value={2}>Friend 2</MenuItem>
-                        </Select>
+                        {/*<InputLabel>Target Friend</InputLabel>*/}
+                        {/*<Select*/}
+                        {/*    label="Friend"*/}
+                        {/*    // We have to set these up*/}
+                        {/*    // value={channel} // Use state variable*/}
+                        {/*    // onChange={handleChannelChange} // Use handler*/}
+                        {/*>*/}
+                        {/*    /!* We set a map to add the items *!/*/}
+                        {/*    <MenuItem value={1}>Friend 1</MenuItem>*/}
+                        {/*    <MenuItem value={2}>Friend 2</MenuItem>*/}
+                        {/*</Select>*/}
+                        <TextField id="outlined-basic" label="Friend ID" variant="outlined" />
                     </CustomFormControl>
                     <CustomFormControl>
                         <InputLabel>Default Voice</InputLabel>
