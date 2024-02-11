@@ -349,6 +349,7 @@ export default function NewPage() {
                                 multiple
                                 onChange={handleFileChange}
                                 style={{ marginBottom: '16px', color: '#fff'  }}
+                                accept="audio/*"
                             />
                             <List>
                                 {selectedFiles.map((file, index) => (
