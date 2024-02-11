@@ -232,9 +232,9 @@ export default function NewPage() {
     }, [])
 
 
-    const handleServerChange = (event) => {
+    const handleServerChange = (server) => {
         // console.log(event.target.value)?
-        setServer(event.target.value);
+        setServer(server.id);
         setChannel('');
     };
 
@@ -374,18 +374,22 @@ export default function NewPage() {
                 <Typography variant="h6">{userName}</Typography>
             </ProfileSection>
             <FormSection>
-                <CustomFormControl>
-                    <InputLabel>Server</InputLabel>
-                    <Select
-                        label="Server"
-                        value={server}
-                        onChange={handleServerChange}
-                    >
-                        {servers.map((guild) => (
-                            <MenuItem key={guild.id} value={guild.id}>{guild.name}</MenuItem>
-                        ))}
-                    </Select>
-                </CustomFormControl>
+                    <Autocomplete
+                        disablePortal
+                        id="combo-box-demo"
+                        options={servers}
+                        onChange={(event, newValue) => handleServerChange(newValue)}
+                        getOptionLabel={(option) => option.name} // Use the username as the label for each option
+                        renderOption={(props, option) => (
+                            console.log(option.icon) ||
+                            <Box component="li" {...props}>
+                                <Avatar src={`https://cdn.discordapp.com/icons/${option.id}/${option.icon}.webp?size=128`} sx={{ width: 24, height: 24, marginRight: 2 }} />
+                                {option.name}
+                            </Box>
+                        )}
+                        sx={{ margin: "16px" }}
+                        renderInput={(params) => <TextField {...params} label="Server" />}
+                    />
                     <CustomFormControl>
                         <InputLabel>Channel</InputLabel>
                         <Select
