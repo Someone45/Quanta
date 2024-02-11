@@ -24,15 +24,18 @@ const theme = createTheme({
 });
 
 const MessageLog = styled(Box)(({ theme }) => ({
-    backgroundColor: '#808080', // White background color
+    backgroundColor: '#808080', // Grey background color
     border: '0px solid #000000', // Tiny black borders
     borderRadius: '4px', // Rounded corners for aesthetics
     flexGrow: 1, // Allow the message log to expand to fill the available space
-    minHeight: '150px', // Minimum height to enable scrolling
     padding: theme.spacing(2), // Add padding for better appearance
-    overflowY: 'auto', // Enable vertical scrolling
     position: 'relative', // Position relative to contain the absolute-positioned white box
+    height: '100%', // Fill the available height within the ChatSection
+    overflowY: 'auto', // Enable vertical scrolling
+    maxHeight: '65%', // Limit the maximum height to the height of the ChatSection
+
 }));
+
 
 const WhiteBox = styled(Box)({
     position: 'absolute',
@@ -105,8 +108,7 @@ const ChatSection = styled(Box)(({ theme }) => ({
 
     flexBasis: '50%', // Suggest an initial height, but adjust based on your layout
     minHeight: '200px', // Minimum height
-    padding: theme.spacing(2),
-    overflowY: 'auto', // Enable vertical scrolling
+    padding: theme.spacing(2)
 }));
 
 const UploadSection = styled(Box)(({ theme }) => ({
@@ -318,8 +320,9 @@ export default function NewPage() {
                 <FormGroup>
                     <FormControlLabel
                         control={<Switch checked={isFilterEnabled} onChange={handleFilterEnabledChange} />}
-                        label={isFilterEnabled ? "On" : "Off"}
+                        label={<Typography style={{ color: '#fff' }}>{isFilterEnabled ? "On" : "Off"}</Typography>}
                     />
+
                 </FormGroup>
             </FormSection>
             <RightContainer>
