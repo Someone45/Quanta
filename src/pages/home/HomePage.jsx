@@ -221,7 +221,7 @@ export default function NewPage() {
                 setUserName(data.username)
                 setUserPhoto(data.avatar)
             })
-            .catch(error => console.error('Error fetching guilds:', error));
+            .catch(error => console.error('Error fetching user-info:', error));
     })
 
     const handleServerChange = (event) => {
