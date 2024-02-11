@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import { styled, createTheme, ThemeProvider} from '@mui/material/styles';
-import { Avatar, Box, Button, FormControl, TextField, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel } from '@mui/material';
+import { Avatar, Box, Button, FormControl, TextField, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel, Autocomplete } from '@mui/material';
 import { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import logo from './Quanta.svg'
@@ -164,6 +164,8 @@ export default function NewPage() {
 
     const [messages, setMessages] = useState([]);
 
+    const [tempUserList, setTempUserList] = useState([''])
+
 
     useEffect(() => {
         token.current = localStorage.getItem("token");
@@ -285,30 +287,7 @@ export default function NewPage() {
         setIsFilterEnabled(event.target.checked);
     };
 
-    // function base64toBlob(base64Data, contentType){
-    //     try {
-    //         contentType = contentType || "";
-    //         var sliceSize = 1024;
-    //         var byteCharacters = atob(base64Data);
-    //         var bytesLength = byteCharacters.length;
-    //         var slicesCount = Math.ceil(bytesLength / sliceSize);
-    //         var byteArrays = new Array(slicesCount);
-    //
-    //         for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-    //             var begin = sliceIndex * sliceSize;
-    //             var end = Math.min(begin + sliceSize, bytesLength);
-    //
-    //             var bytes = new Array(end - begin);
-    //             for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
-    //                 bytes[i] = byteCharacters[offset].charCodeAt(0);
-    //             }
-    //             byteArrays[sliceIndex] = new Uint8Array(bytes);
-    //         }
-    //         return new Blob(byteArrays, { type: contentType });
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    // }
+
 
 
     useEffect(() => {
@@ -358,7 +337,21 @@ export default function NewPage() {
 
 
     const handleChannelChange = (event) => {
+        fetch('http://127.0.0.1:5000/get-users-list', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token.current, channel: event.target.value }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Data.users: ", data.members)
+                setTempUserList(data.members);
+            })
+            .catch(error => console.error('Error fetching user-info:', error));
         setChannel(event.target.value);
+
     };
 
     // Need to implement a function that handles file deletes that are in the server
@@ -480,7 +473,14 @@ export default function NewPage() {
                     </CustomTabs>
                     {activeTab === 0 && (
                         <Box>
-                            <TextField id="outlined-basic" onChange={handleSpeakerIdChange} label="Friend ID" variant="outlined" />
+                            {/*<TextField id="outlined-basic" onChange={handleSpeakerIdChange} label="Friend ID" variant="outlined" />*/}
+                            <Autocomplete
+                                disablePortal
+                                id="combo-box-demo"
+                                options={["The Shawshanke Redemption", "The Godfather", "The Dark Knight", "12 Angry"]}
+                                sx={{ width: 300 }}
+                                renderInput={(params) => <TextField {...params} label="Friend ID" />}
+                            />
                             <form onSubmit={postFiles}>
                                 <input
                                     type="file"

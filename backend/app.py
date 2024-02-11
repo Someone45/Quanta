@@ -268,6 +268,21 @@ def get_server_icon(size=256):
     except Exception as e:
         print(e)
 
+@app.route('/get-users-list', methods=['POST'])
+def get_users_list():
+    try:
+        data = request.get_json()
+        token = data['token']
+        channel_id = data['channel']
+        guild_id = data['guild']
+        members = requests.get(f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50',
+                                  headers={"Authorization": f"{token}"}).json()
+        # Extract member IDs, usernames, and avatars
+        member_list = [{'id': member['author']['id'], 'username': member['author']['username'], 'avatar': member['author']['avatar']} for member in members]
+        return jsonify({'members': member_list}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Error fetching users'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
