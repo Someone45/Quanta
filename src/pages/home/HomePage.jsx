@@ -3,6 +3,7 @@ import { styled, createTheme, ThemeProvider} from '@mui/material/styles';
 import { Avatar, Box, Button, FormControl, TextField, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel, Autocomplete } from '@mui/material';
 import { useState, useEffect } from 'react';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
+import PauseIcon from '@mui/icons-material/Pause';
 import logo from './Quanta.svg'
 import { Link } from 'react-router-dom';
 
@@ -156,6 +157,7 @@ export default function NewPage() {
     const [servers, setServers] = useState([]);
     const [channels , setChannels] = useState([]);
     const [channel, setChannel] = useState('');
+    const [recorder, setRecorder] = useState(null);
     const token = useRef('')
 
     const [userName, setUserName] = useState('')
@@ -248,10 +250,6 @@ export default function NewPage() {
         setSelectedFiles(updatedFiles);
     };
 
-    const handleSpeakerIdChange = (event) => {
-        setSpeakerId(event.target.value);
-    }
-
     const handleRemoveFile = (index) => {
         // Remove the file at the given index (might need to add some server logic to remove from elevenlabs)
         const updatedFiles = selectedFiles.filter((_, i) => i !== index);
@@ -264,6 +262,7 @@ export default function NewPage() {
             return;
         }
         const formData = new FormData();
+        if (!speakerId) return;
         formData.set("speaker_id", speakerId);
         for (let file of selectedFiles) { // Changed 'in' to 'of' for proper iteration
             formData.append('file[]', file);
@@ -312,6 +311,37 @@ export default function NewPage() {
 
     }
 
+    const handleRecordButton = () => {
+        if (recorder) {
+            console.log("stopping?");
+            recorder.stop();
+        } else {
+            startRecording();
+        }
+    }
+
+    const startRecording = (event) => {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+            const mediaRecorder = new MediaRecorder(stream);
+            const chunks = [];
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = () => onStopRecording(chunks, mediaRecorder.mimeType);
+            setRecorder(mediaRecorder);
+            mediaRecorder.start();
+        });
+    }
+
+    const onStopRecording = (chunks, mimeType) => {
+        console.log("stopped!");
+        setRecorder(null);
+        const formData = new FormData();
+        if (!speakerId) return;
+        formData.set("speaker_id", speakerId);
+        const voiceFile = new File(chunks, "voice", {type:{mimeType}})
+        formData.append('file[]', voiceFile);
+        fetch("http://127.0.0.1:5000/add-voice", { body: formData, method: "POST" })
+            .then((res) => res.json()).then(console.log);
+    };
 
 
     useEffect(() => {
@@ -561,8 +591,13 @@ export default function NewPage() {
                             )}
                             {activeTab === 1 && channel.length > 0 && (
                                 <Box>
-                                    <Button style={{"border-radius": "100%"}}>
-                                        <KeyboardVoiceIcon style={{transform:"scale(4)", margin: "55px"}}></KeyboardVoiceIcon>
+                                    <Button style={{"borderRadius": "100%"}} onClick={handleRecordButton}>
+                                        {(!recorder) && (
+                                            <KeyboardVoiceIcon style={{transform:"scale(4)", margin: "55px"}}></KeyboardVoiceIcon>
+                                        )}
+                                        {recorder && (
+                                            <PauseIcon style={{transform:"scale(4)", margin: "55px"}}></PauseIcon>
+                                        )}
                                     </Button>
                                 </Box>
                             )}
