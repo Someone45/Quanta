@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { styled, createTheme, ThemeProvider} from '@mui/material/styles';
 import { Avatar, Box, Button, FormControl, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import logo from './Quanta.svg'
+import Cookies from 'universal-cookie';
 
 // Dark theme configuration
 const theme = createTheme({
@@ -121,6 +122,66 @@ export default function NewPage() {
     const [messageFilter, setMessageFilter] = useState('allMessages');
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
+    const [server, setServer] = useState('');
+    const [servers, setServers] = useState([]);
+    const [channels , setChannels] = useState([]);
+    const [channel, setChannel] = useState('');
+    const token = useRef('')
+
+    useEffect(() => {
+        const cookies = new Cookies();
+        token.current = cookies.get('token');
+
+        // console.log('Token:', token)
+
+        console.log("Fetch happened at get users")
+        // console.log("Token is: ", token)
+
+        // Fetch guilds with the token
+        fetch('http://127.0.0.1:5000/get_user_servers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token.current }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                const guilds = Object.entries(data).map(([id, [name, icon]]) => ({ id, name, icon }));
+                setServers(guilds);
+            })
+            .catch(error => console.error('Error fetching guilds:', error));
+    }, []);
+
+
+    useEffect(()=> {
+
+        console.log("Server changed")
+
+        //Fetching channels
+        fetch('http://127.0.0.1:5000/get_server_channels', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ guildID: server, token: token.current })
+        }).then(
+            response => response.json()
+        )
+        .then(data => {
+            // Map channels and names
+            const channels = Object.entries(data).map(([id, name]) => ({ id, name }));
+            setChannels(channels);
+        }
+        )
+    }, [server])
+
+    const handleServerChange = (event) => {
+        // console.log(event.target.value)?
+        setServer(event.target.value);
+    };
+
+
     const handleFileChange = (event) => {
         const newFiles = event.target.files;
         const updatedFiles = [...selectedFiles, ...Array.from(newFiles)].slice(0, 3);
@@ -145,6 +206,10 @@ export default function NewPage() {
         setIsFilterEnabled(event.target.checked);
     };
 
+    const handleChannelChange = (event) => {
+        setChannel(event.target.value);
+    };
+
     // Need to implement a function that handles file deletes that are in the server
 
     //
@@ -159,31 +224,29 @@ export default function NewPage() {
                 <Typography variant="h6">userID</Typography>
             </ProfileSection>
             <FormSection>
-                    <CustomFormControl>
-                        <InputLabel>Server</InputLabel>
-                        <Select
-                            label="Server"
-                            // We have to set these up
-                            // value={server} // Use state variable
-                            // onChange={handleServerChange} // Use handler
-                        >
-                            {/* We set a map to add the items */}
-                            {/*for (let index = 0; index <*/}
-                            <MenuItem value={1}>Server 1</MenuItem>
-                            <MenuItem value={2}>Server 2</MenuItem>
-                        </Select>
-                    </CustomFormControl>
+                <CustomFormControl>
+                    <InputLabel>Server</InputLabel>
+                    <Select
+                        label="Server"
+                        value={server}
+                        onChange={handleServerChange}
+                    >
+                        {servers.map((guild) => (
+                            <MenuItem key={guild.id} value={guild.id}>{guild.name}</MenuItem>
+                        ))}
+                    </Select>
+                </CustomFormControl>
                     <CustomFormControl>
                         <InputLabel>Channel</InputLabel>
                         <Select
                             label="Channel"
                             // We have to set these up
-                            // value={channel} // Use state variable
-                            // onChange={handleChannelChange} // Use handler
+                            value={channel} // Use state variable
+                            onChange={handleChannelChange} // Use handler
                         >
-                            {/* We set a map to add the items */}
-                            <MenuItem value={1}>Channel 1</MenuItem>
-                            <MenuItem value={2}>Channel 2</MenuItem>
+                            {channels.map((channel) => (
+                                <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
+                            ))}
                         </Select>
                     </CustomFormControl>
                     <CustomFormControl>

@@ -26,13 +26,18 @@ def hello_world():  # put application's code here
 def get_user_servers():
     try:
         data = request.get_json()
+        print(f"Data: {data}")
         token = data.get('token')
+        print(f"Token: {token}")
         if not token:
             return jsonify({"error": "Token is required"}), 400
 
         guilds = requests.get('https://discordapp.com/api/users/@me/guilds',
                               headers={"Authorization": f"{token}"}).json()
-        return jsonify({guild['id']: [guild['name'], guild['icon']] for guild in guilds})
+        print(f"Guilds: {guilds}")
+        guilds_dict = {guild['id']: [guild['name'], guild['icon']] for guild in guilds}
+        print(guilds_dict)
+        return jsonify(guilds_dict)
     except Exception as e:
         print(e)
         return jsonify({"error": "An error occurred"}), 500
@@ -42,14 +47,22 @@ def get_user_servers():
 def get_server_channels():
     try:
         data = request.get_json()
-        guild_id = data.get('guild_id')
+        guild_id = data.get('guildID')
         token = data.get('token')
+
+        print(f"Data: {data}")
+        print(f"Guild ID: {guild_id}")
+        print(f"Token: {token}")
+
+
         if not guild_id or not token:
             return jsonify({"error": "Guild ID and Token are required"}), 400
 
         channels = requests.get(f'https://discord.com/api/v9/guilds/{guild_id}/channels',
                                 headers={'Authorization': token}).json()
-        return jsonify({channel['id']: channel['name'] for channel in channels})
+        channel_dict = {channel['id']: channel['name'] for channel in channels if channel['type'] == 0}
+
+        return jsonify(channel_dict)
     except Exception as e:
         print(e)
         return jsonify({"error": "An error occurred"}), 500

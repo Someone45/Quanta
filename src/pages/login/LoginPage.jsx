@@ -53,6 +53,7 @@ function MyComponent() {
 const LoginPage = () => {
     const [token, setToken] = useState('');
 
+
     const handleSubmit = async (event) => {
     event.preventDefault();
     console.log("Token submitted:", token);
@@ -67,8 +68,8 @@ const LoginPage = () => {
     })
     .then(response => {
         if (response.ok) {
-            const cookies = new Cookies(null, { path: '/' });
-            cookies.set('token', token);
+            const cookies = new Cookies();
+            cookies.set('token', token, { path: '/' });
             window.location.href = "http://127.0.0.1:5173/home";
             // Response is OK
             console.log("Login successful");
