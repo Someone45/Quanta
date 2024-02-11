@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import { styled, createTheme, ThemeProvider} from '@mui/material/styles';
 import { Avatar, Box, Button, FormControl, TextField, InputLabel, Select, MenuItem, Typography, Tab, Tabs, List, ListItem, IconButton, Switch, FormGroup, FormControlLabel, Autocomplete } from '@mui/material';
 import { useState, useEffect } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
+import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import logo from './Quanta.svg'
 import { Link } from 'react-router-dom';
 
@@ -498,10 +498,10 @@ export default function NewPage() {
             <Separator />
                 <UploadSection>
                     <CustomTabs value={activeTab} onChange={handleChangeTab} aria-label="upload tabs">
-                        <Tab label="Upload" />
-                        <Tab label="Options" />
+                        <Tab label="Upload Audio" />
+                        <Tab label="Record Voice" />
+                        {/* <Tab label="Options" /> */}
                     </CustomTabs>
-                    {activeTab === 0 && (
                         <Box>
                             <Autocomplete
                                 disablePortal
@@ -520,48 +520,58 @@ export default function NewPage() {
                                 )}
                                 sx={{ width: 300 }}
                                 renderInput={(params) => <TextField {...params} label="Friend ID" />}
-                            />
-                            <form onSubmit={postFiles}>
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={handleFileChange}
-                                    style={{ marginBottom: '16px', color: '#fff'  }}
-                                    accept="audio/*"
-                                    name='files[]' />
-                                <List>
-                                    {selectedFiles.map((file, index) => (
-                                        <ListItem
-                                        key={index}
-                                        sx={{
-                                            border: '1px solid #303030', // Add a border around the list item
-                                            borderRadius: '4px', // Add border radius for aesthetics
-                                            marginBottom: '8px', // Add some bottom margin for spacing
-                                            color: '#fff', // Set text color to white
-                                            padding: '8px', // Add padding inside the list item
-                                        }}
-                                        secondaryAction={
-                                            <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(index)}>
-                                                <CloseIcon />
-                                            </IconButton>
-                                        }
-                                    >
-                                        {file.name}
-                                    </ListItem>
+                                />
+                            {activeTab === 0 && channel &&  (
+                                <Box>
+                                    <form onSubmit={postFiles}>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            onChange={handleFileChange}
+                                            style={{ marginBottom: '16px', color: '#fff'  }}
+                                            accept="audio/*"
+                                            name='files[]' />
+                                        <List>
+                                            {selectedFiles.map((file, index) => (
+                                                <ListItem
+                                                key={index}
+                                                sx={{
+                                                    border: '1px solid #303030', // Add a border around the list item
+                                                    borderRadius: '4px', // Add border radius for aesthetics
+                                                    marginBottom: '8px', // Add some bottom margin for spacing
+                                                    color: '#fff', // Set text color to white
+                                                    padding: '8px', // Add padding inside the list item
+                                                }}
+                                                secondaryAction={
+                                                    <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(index)}>
+                                                        <CloseIcon />
+                                                    </IconButton>
+                                                }
+                                            >
+                                                {file.name}
+                                            </ListItem>
 
-                                    ))}
-                                </List>
-                                <Button type="submit">
-                                        Upload
-                                </Button>
-                            </form>
+                                            ))}
+                                        </List>
+                                        <Button type="submit">
+                                                Upload
+                                        </Button>
+                                    </form>
+                                </Box>
+                            )}
+                            {activeTab === 1 && channel.length > 0 && (
+                                <Box>
+                                    <Button style={{"border-radius": "100%"}}>
+                                        <KeyboardVoiceIcon style={{transform:"scale(4)", margin: "55px"}}></KeyboardVoiceIcon>
+                                    </Button>
+                                </Box>
+                            )}
                         </Box>
-                    )}
-                {activeTab === 1 && (
+                {/* {activeTab === 2 && (
                     <Box>
                         <Typography>If we add some options or anything extra</Typography>
                     </Box>
-                )}
+                )} */}
             </UploadSection>
             </RightContainer>
         </PageContainer>
