@@ -345,7 +345,7 @@ export default function NewPage() {
                                 type="file"
                                 multiple
                                 onChange={handleFileChange}
-                                style={{ marginBottom: '16px' }}
+                                style={{ marginBottom: '16px', color: '#fff'  }}
                             />
                             <List>
                                 {selectedFiles.map((file, index) => (
@@ -355,6 +355,7 @@ export default function NewPage() {
                                         border: '1px solid #303030', // Add a border around the list item
                                         borderRadius: '4px', // Add border radius for aesthetics
                                         marginBottom: '8px', // Add some bottom margin for spacing
+                                        color: '#fff', // Set text color to white
                                         padding: '8px', // Add padding inside the list item
                                     }}
                                     secondaryAction={
