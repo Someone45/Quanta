@@ -244,7 +244,7 @@ export default function NewPage() {
 
     const handleFileChange = (event) => {
         const newFiles = event.target.files;
-        const updatedFiles = [...selectedFiles, ...Array.from(newFiles)].slice(0, 3);
+        const updatedFiles = [...selectedFiles, ...Array.from(newFiles)].slice(0, 1);
         setSelectedFiles(updatedFiles);
     };
 
@@ -489,6 +489,10 @@ export default function NewPage() {
                                 disablePortal
                                 id="combo-box-demo"
                                 options={tempUserList}
+                                onChange = {(event, value) => {
+                                    console.log(value);
+                                    setSpeakerId(value.id);
+                                }}
                                 getOptionLabel={(option) => option.username} // Use the username as the label for each option
                                 renderOption={(props, option) => (
                                     <Box component="li" {...props}>

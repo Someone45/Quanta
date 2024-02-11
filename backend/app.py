@@ -109,16 +109,19 @@ def scrape_for_new_messages():
         all_audios = []
         new_messages = []
 
+        models = get_models()
+
         for message in messages:
-            if message['author']['id'] in friend_ids:
+            if message['author']['id'] in models:
                 msg_id = message['id']
                 new_cache[msg_id] = message['content']
+                model_id = models[message['author']['id']]
 
                 # Generate audio only if it's not the first run
                 if cached_messages and msg_id not in cached_messages:
                     print(f"Processing new message for audio: {message['content']}")
                     new_messages.append(message['content'])
-                    base64_audio = generate_voice_audio("R9asNVmLdxUDvLwyCH4Q", message['content'])
+                    base64_audio = generate_voice_audio(model_id, message['content'])
                     all_audios.append(base64_audio)
             elif messages_allowed == "allMessages":
                 msg_id = message['id']
