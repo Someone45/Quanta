@@ -381,7 +381,7 @@ export default function NewPage() {
                     console.error('Error fetching guilds:', error);
                 }
 
-                await delay(1000); // Wait for 1 second before the next fetch
+                await delay(250); // Wait for 1 second before the next fetch
             }
         };
 
@@ -492,7 +492,6 @@ export default function NewPage() {
                             <MenuItem value={2}>Voice 2</MenuItem>
                         </Select>
                     </CustomFormControl>
-                <CustomButton>Update</CustomButton>
                 <CustomFormControl>
                     <InputLabel id="message-filter-label">Message Filter</InputLabel>
                     <Select
