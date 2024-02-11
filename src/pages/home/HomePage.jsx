@@ -146,6 +146,7 @@ const LogoImage = styled('img')({
 
 export default function NewPage() {
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [speakerId, setSpeakerId] = useState('');
     const [activeTab, setActiveTab] = useState(0);
 
     const [messageFilter, setMessageFilter] = useState('allMessages');
@@ -236,10 +237,29 @@ export default function NewPage() {
         setSelectedFiles(updatedFiles);
     };
 
+    const handleSpeakerIdChange = (event) => {
+        setSpeakerId(event.target.value);
+    }
+
     const handleRemoveFile = (index) => {
         // Remove the file at the given index (might need to add some server logic to remove from elevenlabs)
         const updatedFiles = selectedFiles.filter((_, i) => i !== index);
         setSelectedFiles(updatedFiles);
+    };
+
+    const postFiles = (event) => {
+        event.preventDefault();
+        if (selectedFiles.length > 3) {
+            return;
+        }
+        const formData = new FormData();
+        formData.set("speaker_id", speakerId);
+        for (let file in selectedFiles) {
+            formData.append('file[]', selectedFiles[file]);
+        }
+
+        fetch("http://127.0.0.1:5000/add-voice", { body: formData, method: "POST" })
+            .then((res) => res.json()).then(console.log);
     };
 
     const handleChangeTab = (event, newValue) => {
@@ -314,7 +334,6 @@ export default function NewPage() {
                         {/*    <MenuItem value={1}>Friend 1</MenuItem>*/}
                         {/*    <MenuItem value={2}>Friend 2</MenuItem>*/}
                         {/*</Select>*/}
-                        <TextField id="outlined-basic" label="Friend ID" variant="outlined" />
                     </CustomFormControl>
                     <CustomFormControl>
                         <InputLabel>Default Voice</InputLabel>
@@ -348,7 +367,6 @@ export default function NewPage() {
                         control={<Switch checked={isFilterEnabled} onChange={handleFilterEnabledChange} />}
                         label={<Typography style={{ color: '#fff' }}>{isFilterEnabled ? "On" : "Off"}</Typography>}
                     />
-
                 </FormGroup>
             </FormSection>
             <RightContainer>
@@ -370,35 +388,41 @@ export default function NewPage() {
                     </CustomTabs>
                     {activeTab === 0 && (
                         <Box>
-                            <input
-                                type="file"
-                                multiple
-                                onChange={handleFileChange}
-                                style={{ marginBottom: '16px', color: '#fff'  }}
-                                accept="audio/*"
-                            />
-                            <List>
-                                {selectedFiles.map((file, index) => (
-                                    <ListItem
-                                    key={index}
-                                    sx={{
-                                        border: '1px solid #303030', // Add a border around the list item
-                                        borderRadius: '4px', // Add border radius for aesthetics
-                                        marginBottom: '8px', // Add some bottom margin for spacing
-                                        color: '#fff', // Set text color to white
-                                        padding: '8px', // Add padding inside the list item
-                                    }}
-                                    secondaryAction={
-                                        <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(index)}>
-                                            <CloseIcon />
-                                        </IconButton>
-                                    }
-                                >
-                                    {file.name}
-                                </ListItem>
+                            <TextField id="outlined-basic" onChange={handleSpeakerIdChange} label="Friend ID" variant="outlined" />
+                            <form onSubmit={postFiles}>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={handleFileChange}
+                                    style={{ marginBottom: '16px', color: '#fff'  }}
+                                    accept="audio/*"
+                                    name='files[]'                                />
+                                <List>
+                                    {selectedFiles.map((file, index) => (
+                                        <ListItem
+                                        key={index}
+                                        sx={{
+                                            border: '1px solid #303030', // Add a border around the list item
+                                            borderRadius: '4px', // Add border radius for aesthetics
+                                            marginBottom: '8px', // Add some bottom margin for spacing
+                                            color: '#fff', // Set text color to white
+                                            padding: '8px', // Add padding inside the list item
+                                        }}
+                                        secondaryAction={
+                                            <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(index)}>
+                                                <CloseIcon />
+                                            </IconButton>
+                                        }
+                                    >
+                                        {file.name}
+                                    </ListItem>
 
-                                ))}
-                            </List>
+                                    ))}
+                                </List>
+                                <Button type="submit">
+                                        Upload
+                                </Button>
+                            </form>
                         </Box>
                     )}
                 {activeTab === 1 && (

@@ -1,4 +1,5 @@
 from flask import Flask, make_response, redirect, request, jsonify
+import flask
 from flask_cors import CORS
 import requests
 import json
@@ -13,6 +14,8 @@ load_dotenv()
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+# Max 5 megabytes for file uploads
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000
 
 LABS_TOKEN = os.getenv('LABS_TOKEN')
 
@@ -123,28 +126,28 @@ def add_voice():
     """
     Send binary to this endpoint since that's what the API expects
     """
-    if 'files' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['files']
+    files = flask.request.files.getlist("file[]")
 
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    if not files:
+        return jsonify({'error': 'No audio files'}), 400
 
-    description = request.form.get('description', '')
-    labels = request.form.get('labels', '')
-    name = request.form.get('name', '')
+    # description = request.form.get('description', '')
+    # labels = request.form.get('labels', '')
+    speakerDiscordId = request.form.get('speaker_id', None)
+    if not speakerDiscordId:
+        return jsonify({'error': 'No speaker id'}), 400
 
     url = "https://api.elevenlabs.io/v1/voices/add"
     headers = {
         "xi-api-key": LABS_TOKEN,
     }
-    files = {'files': (file.filename, file.read(), file.content_type)}
     data = {
-        'description': description,
-        'labels': labels,
-        'name': name
+        'name': speakerDiscordId
+        # 'description': description,
+        # 'labels': labels,
     }
 
+    files = [("files", (file.filename, file.read(), file.content_type)) for file in files]
     response = requests.post(url, headers=headers, files=files, data=data)
 
     if response.status_code == 200:
