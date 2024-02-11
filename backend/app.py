@@ -88,7 +88,6 @@ def scrape_for_new_messages():
         data = request.get_json()
         token = data.get('token')
         channel_id = data.get('channel_id')
-        friend_ids = data.get('friend_ids')
         cached_messages = data.get('cached_messages', {})
         default_voice = data.get('defaultVoice')
         messages_allowed = data.get('messagesAllowed')
@@ -97,8 +96,8 @@ def scrape_for_new_messages():
 
         preset_voices = {1: 'pNInz6obpgDQGcFmaJgB', 2 : 'jsCqWAovK2LkecY7zXl4'}
 
-        if not token or not channel_id or not friend_ids:
-            return jsonify({"error": "Token, Channel ID, and Friend IDs are required"}), 400
+        if not token or not channel_id:
+            return jsonify({"error": "Token and Channel ID are required"}), 400
 
         with requests.Session() as session:
             response = session.get(f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50',
@@ -117,10 +116,13 @@ def scrape_for_new_messages():
                 new_cache[msg_id] = message['content']
                 model_id = models[message['author']['id']]
 
+                print(f"Message Author: {message['author']}")
+
                 # Generate audio only if it's not the first run
                 if cached_messages and msg_id not in cached_messages:
                     print(f"Processing new message for audio: {message['content']}")
-                    new_messages.append(message['content'])
+                    new_messages.append([message['content'], message['author']['username'], message['author']['id'], message['author']['avatar']])
+                    # new_messages.append(message['content'])
                     base64_audio = generate_voice_audio(model_id, message['content'])
                     all_audios.append(base64_audio)
             elif messages_allowed == "allMessages":

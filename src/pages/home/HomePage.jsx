@@ -265,13 +265,26 @@ export default function NewPage() {
         }
         const formData = new FormData();
         formData.set("speaker_id", speakerId);
-        for (let file in selectedFiles) {
-            formData.append('file[]', selectedFiles[file]);
+        for (let file of selectedFiles) { // Changed 'in' to 'of' for proper iteration
+            formData.append('file[]', file);
         }
 
         fetch("http://127.0.0.1:5000/add-voice", { body: formData, method: "POST" })
-            .then((res) => res.json()).then(console.log);
+            .then((res) => {
+                if (res.ok) { // Check if response status is OK
+                    alert('Files uploaded successfully!'); // Show success alert
+                    return res.json();
+                } else {
+                    throw new Error('Something went wrong with the upload.'); // Handle server-side errors
+                }
+            })
+            .then((data) => console.log(data))
+            .catch((error) => {
+                console.error(error);
+                alert(error.message); // Show error alert if there's a problem with the fetch operation
+            });
     };
+
 
     const handleChangeTab = (event, newValue) => {
         setActiveTab(newValue);
@@ -316,14 +329,14 @@ export default function NewPage() {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ token: token.current, channel_id: channel, friend_ids: ["1097538072482160641"], cached_messages: cachedMessages.current, defaultVoice: defaultVoice, messagesAllowed: messageFilter.current}),
+                        body: JSON.stringify({ token: token.current, channel_id: channel, cached_messages: cachedMessages.current, defaultVoice: defaultVoice, messagesAllowed: messageFilter.current}),
                     });
 
                     const data = await response.json();
                     cachedMessages.current = data.cache;
                     const newMessages = data.messages;
 
-                    setMessages(prevMessages => [...prevMessages, ...newMessages.map(msg => ({ content: msg }))]);
+                    setMessages(prevMessages => [...prevMessages, ...newMessages.map(msg => ({ content: msg[0], author: msg[1], id: msg[2], avatar: msg[3] }))]);
 
                     console.log(`New messages: ${newMessages}`);
                     data.audios.forEach((message) => {
@@ -475,7 +488,8 @@ export default function NewPage() {
                         padding: '8px', // Add padding inside each message
                         borderRadius: '4px', // Rounded corners for each message
                     }}>
-                        {message.content}
+                        {/*"https://cdn.discordapp.com/avatars/{member_id}/{member['author']['avatar']}.webp?size=16*/}
+                        <Avatar src={`https://cdn.discordapp.com/avatars/${message.id}/${message.avatar}.webp?size=48`} sx={{ width: 48, height: 48, marginRight: 2 }} /> <b>{message.author} </b>: {message.content}
                     </Box>
                 ))}
             </MessageLog>
