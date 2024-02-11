@@ -8,6 +8,8 @@ import base64
 from dotenv import load_dotenv
 import os
 from PIL import Image
+import json
+from pathlib import Path
 
 load_dotenv()
 
@@ -18,7 +20,16 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000
 
 LABS_TOKEN = os.getenv('LABS_TOKEN')
+JSON_PATH = Path("eleven_labs_models.json") # Maps from Discord id to Eleven labs model name
 
+def get_models() -> dict[str, str]:
+    return json.loads(JSON_PATH.read_text()) if JSON_PATH.exists() else {}
+
+def get_user_voice_model(discord_id: str) -> str | None:
+    return get_models().get(discord_id)
+
+def set_user_voice_model(discord_id: str, eleven_labs_model: str):
+    JSON_PATH.write_text(json.dumps(get_models().update({discord_id: eleven_labs_model})))
 
 @app.route('/')
 def hello_world():  # put application's code here
@@ -126,24 +137,24 @@ def add_voice():
     if not files:
         return jsonify({'error': 'No audio files'}), 400
 
-    # description = request.form.get('description', '')
-    # labels = request.form.get('labels', '')
-    speakerDiscordId = request.form.get('speaker_id', None)
-    if not speakerDiscordId:
+    speaker_discord_id = request.form.get('speaker_id', None) # TODO: Check if speaker is a real person
+    if not speaker_discord_id:
         return jsonify({'error': 'No speaker id'}), 400
 
-    url = "https://api.elevenlabs.io/v1/voices/add"
     headers = {
         "xi-api-key": LABS_TOKEN,
     }
-    data = {
-        'name': speakerDiscordId
-        # 'description': description,
-        # 'labels': labels,
-    }
+
+    # Delete old model if it exists
+    if old_model := get_user_voice_model(speaker_discord_id):
+        requests.delete(f"https://api.elevenlabs.io/v1/voices/{old_model}", headers=headers)
 
     files = [("files", (file.filename, file.read(), file.content_type)) for file in files]
-    response = requests.post(url, headers=headers, files=files, data=data)
+    data =  {'name': speaker_discord_id }
+    response = requests.post("https://api.elevenlabs.io/v1/voices/add", headers=headers, files=files, data=data)
+
+    new_model = response.json()["voice_id"]
+    set_user_voice_model(speaker_discord_id, new_model)
 
     if response.status_code == 200:
         return jsonify(response.json()), 200
