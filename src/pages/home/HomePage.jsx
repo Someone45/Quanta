@@ -22,6 +22,16 @@ const theme = createTheme({
     },
 });
 
+const MessageLog = styled(Box)(({ theme }) => ({
+    backgroundColor: '#FFFFFF', // White background color
+    border: '0px solid #000000', // Tiny black borders
+    borderRadius: '4px', // Rounded corners for aesthetics
+    flexGrow: 1, // Allow the message log to expand to fill the available space
+    minHeight: '150px', // Minimum height to enable scrolling
+    padding: theme.spacing(2), // Add padding for better appearance
+    overflowY: 'auto', // Enable vertical scrolling
+}));
+
 // Custom styled components adapted for dark mode
 const CustomFormControl = styled(FormControl)(({ theme }) => ({
     margin: theme.spacing(2),
@@ -62,13 +72,13 @@ const ProfileSection = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '20%',
+    width: '10%',
     marginTop: '20px', // Corrected syntax
 });
 
 
 const FormSection = styled(Box)({
-    transform: 'translateX(-80px)', // Adjust the pixel value as needed to move to the left
+    transform: 'translateX(-20px)', // Adjust the pixel value as needed to move to the left
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -79,6 +89,7 @@ const ChatSection = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.paper,
     flexGrow: 1,
     flexShrink: 1, // Allow shrinking
+
     flexBasis: '50%', // Suggest an initial height, but adjust based on your layout
     minHeight: '200px', // Minimum height
     padding: theme.spacing(2),
@@ -111,7 +122,7 @@ const Separator = styled(Box)(({ theme }) => ({
 const LogoImage = styled('img')({
     position: 'fixed',
     bottom: '10px',
-    left: '10px',
+    left: '15px',
     width: '100px',
     height: 'auto',
 });
@@ -241,6 +252,9 @@ export default function NewPage() {
                 <CustomTabs value={0} aria-label="chat tabs">
                     <Tab label="Chat Logs" />
                 </CustomTabs>
+                <MessageLog>
+                {/* Add your incoming messages here */}
+                </MessageLog>
                 {/* We populate this with discord */}
             </ChatSection>
             <Separator />
