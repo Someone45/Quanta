@@ -75,53 +75,36 @@ def get_server_channels():
 def scrape_for_new_messages():
     try:
         data = request.get_json()
-#         print(f"Data: {data}")
         token = data.get('token')
-#         first = False
         channel_id = data.get('channel_id')
         friend_ids = data.get('friend_ids')
-        cached_messages = data.get('cached_messages')
+        cached_messages = data.get('cached_messages', {})
+
         if not token or not channel_id or not friend_ids:
-            return jsonify({"error": "Token, Channel ID, Cached Messages and Friend IDs are required"}), 400
+            return jsonify({"error": "Token, Channel ID, and Friend IDs are required"}), 400
 
         with requests.Session() as session:
-            r = session.get(f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50',
-                            headers={'Authorization': token})
-            jsonn = json.loads(r.text)
+            response = session.get(f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50',
+                                   headers={'Authorization': token})
+            messages = response.json()
 
-            # Check if cached_messages is empty, fill up cache
-            if not cached_messages:
-#                 first = True
-                for message in jsonn:
-#                     print(message['content'], message['author']['id'])
-                    if message['author']['id'] in friend_ids:
-#                         print(message['content'], message['author']['id'])
-                        cached_messages[message['id']] = [message['content'], message['author']['id']]
-                return jsonify({"audios": [], "cache": cached_messages}), 200
-            # If not empty, create a new cache and compare
-            else:
-                new_cache = {}
-                for message in jsonn:
-                    if message['author']['id'] in friend_ids:
-                        new_cache[message['id']] = [message['content'], message['author']['id']]
+        new_cache = {}
+        all_audios = []
+        new_messages = []
 
-                # Check for new messages not in the cached_messages
-                all_audios = []
-#                 new_messages = []
-                for key, value in new_cache.items():
-                    if key not in cached_messages:
-                        print(f"Text to be converted to audio: {value[0]}")
-#                         new_messages.append(value[0])
-                        """
-                        Be careful to not spam this like crazy otherwise we will run out of credits fast
-#                         """
+        for message in messages:
+            if message['author']['id'] in friend_ids:
+                msg_id = message['id']
+                new_cache[msg_id] = message['content']
 
-                        base64_audio = generate_voice_audio(voice_id="R9asNVmLdxUDvLwyCH4Q", text=value[0])
-#                         print(f"Base64 Audio: {base64_audio}")
-                        all_audios.append(base64_audio)
-                        break
-                cached_messages = new_cache
-                return jsonify({"audios": all_audios, "cache": cached_messages}), 200
+                # Generate audio only if it's not the first run
+                if cached_messages and msg_id not in cached_messages:
+                    print(f"Processing new message for audio: {message['content']}")
+                    new_messages.append(message['content'])
+                    base64_audio = generate_voice_audio("R9asNVmLdxUDvLwyCH4Q", message['content'])
+                    all_audios.append(base64_audio)
+
+        return jsonify({"audios": all_audios, "cache": new_cache, "messages": new_messages}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": "An error occurred"}), 500

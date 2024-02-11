@@ -161,7 +161,10 @@ export default function NewPage() {
     const [userName, setUserName] = useState('')
     const [userPhoto, setUserPhoto] = useState('')
     // const [cachedMessages, setCachedMessages] = useState({test: "test"})
-    const cachedMessages = useRef({"":""})
+    const cachedMessages = useRef({})
+
+    const [messages, setMessages] = useState([]);
+
 
     useEffect(() => {
         const cookies = new Cookies();
@@ -311,48 +314,48 @@ export default function NewPage() {
 
 
     useEffect(() => {
-        const fetchData = () => {
-            if (!isFilterEnabled) {
-                return; // Exit the recursion if the filter is not enabled
-            }
+        let isActive = true; // Flag to control the loop based on the component's lifecycle
 
-            console.log("Fetching data")
-            // console.log(`Cached messages: ${JSON.stringify(cachedMessages.current)}`)
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-            fetch('http://127.0.0.1:5000/scrape_for_new_messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token: token.current, channel_id: channel, friend_ids: ["1097538072482160641"], cached_messages: cachedMessages.current }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    cachedMessages.current = data.cache
+        const fetchData = async () => {
+            while (isFilterEnabled && isActive) {
+                console.log("Fetching data");
 
-                    const newMessages = data.audios;
-
-
-                    console.log(`New messages: ${newMessages}`)
-
-                    // Loop over messages
-                    newMessages.forEach((message) => {
-                        console.log('data:audio/mpeg;base64,' + message)
-                        const audio = new Audio(`data:audio/mpeg;base64,${message}`);
-                        audio.play();
-                        setTimeout(console.log("Hello"),100000)
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/scrape_for_new_messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ token: token.current, channel_id: channel, friend_ids: ["1097538072482160641"], cached_messages: cachedMessages.current }),
                     });
 
-                    console.log(`New messages: ${newMessages}`)
-                    setTimeout(fetchData, 1000); // Call fetchData again after a 1 second delay
-                })
-                .catch(error => {
+                    const data = await response.json();
+                    cachedMessages.current = data.cache;
+                    const newMessages = data.messages;
+
+                    setMessages(prevMessages => [...prevMessages, ...newMessages.map(msg => ({ content: msg }))]);
+
+                    console.log(`New messages: ${newMessages}`);
+                    data.audios.forEach((message) => {
+                        console.log('data:audio/mpeg;base64,' + message);
+                        const audio = new Audio(`data:audio/mpeg;base64,${message}`);
+                        audio.play();
+                    });
+                } catch (error) {
                     console.error('Error fetching guilds:', error);
-                    setTimeout(fetchData, 1000); // Attempt to fetch again after a 1 second delay even on error
-                });
+                }
+
+                await delay(1000); // Wait for 1 second before the next fetch
+            }
         };
 
-        fetchData(); // Initial call to start the process
+        fetchData().then(r => console.log('Fetching data'));
+
+        return () => {
+            isActive = false; // Prevent the loop from continuing when the component unmounts
+        };
     }, [isFilterEnabled]); // Dependency array to re-run useEffect if isFilterEnabled changes
 
 
@@ -458,9 +461,18 @@ export default function NewPage() {
             </CustomTabs>
             <MessageLog>
 
-                {/* Add your incoming messages here */}
+                {messages.map((message, index) => (
+                    <Box key={index} sx={{
+                        backgroundColor: '#f0f0f0', // Light grey background for each message
+                        margin: '8px 0', // Add some margin between messages
+                        padding: '8px', // Add padding inside each message
+                        borderRadius: '4px', // Rounded corners for each message
+                    }}>
+                        {message.content}
+                    </Box>
+                ))}
             </MessageLog>
-            {/* We populate this with discord */}
+             {/*We populate this with discord */}
             </ChatSection>
             <Separator />
                 <UploadSection>
