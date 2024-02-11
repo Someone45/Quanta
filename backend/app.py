@@ -171,7 +171,7 @@ def delete_voice():
 
     headers = {"xi-api-key": LABS_TOKEN}
 
-    response = requests.request("DELETE", url, headers=headers)
+    response = requests.delete(url, headers=headers)
 
     if response.status_code == 200:
         return jsonify(response.json()), 200
