@@ -560,7 +560,7 @@ export default function NewPage() {
                                 sx={{ width: 300 }}
                                 renderInput={(params) => <TextField {...params} label="Friend ID" />}
                                 />
-                            {activeTab === 0 && channel &&  (
+                            {activeTab === 0 && channel.length &&  (
                                 <Box>
                                     <form onSubmit={postFiles}>
                                         <input
@@ -598,7 +598,7 @@ export default function NewPage() {
                                     </form>
                                 </Box>
                             )}
-                            {activeTab === 1 && channel.length > 0 && (
+                            {activeTab === 1 && channel.length && speakerId.length && (
                                 <Box>
                                     <Button style={{"borderRadius": "100%"}} onClick={handleRecordButton}>
                                         {(!recorder) && (
