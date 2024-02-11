@@ -4,7 +4,6 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import './LoginPage.css';
 import logo from './Quanta.svg'
-import Cookies from 'universal-cookie';
 
 // Custom styled TextField
 const CustomTextField = styled(TextField)({
@@ -67,8 +66,7 @@ const LoginPage = () => {
     })
     .then(response => {
         if (response.ok) {
-            const cookies = new Cookies();
-            cookies.set('token', token, { path: '/' });
+            localStorage.setItem("token", token);
             window.location.href = "http://127.0.0.1:5173/home";
             console.log("Login successful");
         } else {

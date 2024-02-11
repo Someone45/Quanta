@@ -4,7 +4,6 @@ import { Avatar, Box, Button, FormControl, TextField, InputLabel, Select, MenuIt
 import { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import logo from './Quanta.svg'
-import Cookies from 'universal-cookie';
 import { Link } from 'react-router-dom';
 
 // Dark theme configuration
@@ -164,8 +163,7 @@ export default function NewPage() {
     const cachedMessages = useRef({"":""})
 
     useEffect(() => {
-        const cookies = new Cookies();
-        token.current = cookies.get('token');
+        token.current = localStorage.getItem("token");
 
         // console.log('Token:', token)
 
