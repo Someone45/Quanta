@@ -90,6 +90,12 @@ def scrape_for_new_messages():
         channel_id = data.get('channel_id')
         friend_ids = data.get('friend_ids')
         cached_messages = data.get('cached_messages', {})
+        default_voice = data.get('defaultVoice')
+        messages_allowed = data.get('messagesAllowed')
+
+        print(f"Messages allowed: {messages_allowed}")
+
+        preset_voices = {1: 'pNInz6obpgDQGcFmaJgB', 2 : 'jsCqWAovK2LkecY7zXl4'}
 
         if not token or not channel_id or not friend_ids:
             return jsonify({"error": "Token, Channel ID, and Friend IDs are required"}), 400
@@ -114,6 +120,16 @@ def scrape_for_new_messages():
                     new_messages.append(message['content'])
                     base64_audio = generate_voice_audio("R9asNVmLdxUDvLwyCH4Q", message['content'])
                     all_audios.append(base64_audio)
+            elif messages_allowed == "allMessages":
+                msg_id = message['id']
+                new_cache[msg_id] = message['content']
+                # Using default voice
+                # defaultVoice
+                if cached_messages and msg_id not in cached_messages:
+                    new_messages.append(message['content'])
+                    base64_audio = generate_voice_audio(preset_voices[default_voice], message['content'])
+                    all_audios.append(base64_audio)
+
 
         return jsonify({"audios": all_audios, "cache": new_cache, "messages": new_messages}), 200
     except Exception as e:

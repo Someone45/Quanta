@@ -148,7 +148,8 @@ export default function NewPage() {
     const [speakerId, setSpeakerId] = useState('');
     const [activeTab, setActiveTab] = useState(0);
 
-    const [messageFilter, setMessageFilter] = useState('allMessages');
+    // const [messageFilter, setMessageFilter] = useState('allMessages');
+    const messageFilter = useRef('allMessages');
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
     const [server, setServer] = useState('');
@@ -165,6 +166,8 @@ export default function NewPage() {
     const [messages, setMessages] = useState([]);
 
     const [tempUserList, setTempUserList] = useState([''])
+
+    const [ defaultVoice, setDefaultVoice] = useState(1)
 
 
     useEffect(() => {
@@ -275,7 +278,9 @@ export default function NewPage() {
     };
 
     const handleMessageFilterChange = (event) => {
-        setMessageFilter(event.target.value);
+        console.log(event.target.value);
+        messageFilter.current = event.target.value;
+        // setMessageFilter(event.target.value);
     };
 
     const handleFilterEnabledChange = (event) => {
@@ -288,6 +293,11 @@ export default function NewPage() {
         setIsFilterEnabled(event.target.checked);
     };
 
+    const handleDefaultVoiceChange = (event) => {
+        // console.log(event.target.value);
+        setDefaultVoice(event.target.value);
+
+    }
 
 
 
@@ -306,7 +316,7 @@ export default function NewPage() {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ token: token.current, channel_id: channel, friend_ids: ["1097538072482160641"], cached_messages: cachedMessages.current }),
+                        body: JSON.stringify({ token: token.current, channel_id: channel, friend_ids: ["1097538072482160641"], cached_messages: cachedMessages.current, defaultVoice: defaultVoice, messagesAllowed: messageFilter.current}),
                     });
 
                     const data = await response.json();
@@ -418,8 +428,8 @@ export default function NewPage() {
                         <Select
                             label="Default Voice"
                             // We have to set these up
-                            // value={defaultVoice} // Use state variable
-                            // onChange={handleDefaultVoiceChange} // Use handler
+                            value={defaultVoice} // Use state variable
+                            onChange={handleDefaultVoiceChange} // Use handler
                         >
                             {/* We set a map to add the items */}
                             <MenuItem value={1}>Voice 1</MenuItem>
@@ -431,13 +441,13 @@ export default function NewPage() {
                     <InputLabel id="message-filter-label">Message Filter</InputLabel>
                     <Select
                         labelId="message-filter-label"
-                        value={messageFilter}
+                        value={messageFilter.current}
                         label="Message Filter"
                         onChange={handleMessageFilterChange}
                         disabled={!isFilterEnabled}
                     >
                         <MenuItem value="allMessages">All Messages</MenuItem>
-                        <MenuItem value="addedUsersOnly">Added Users Only</MenuItem>
+                        <MenuItem value="usersOnly">Added Users Only</MenuItem>
                     </Select>
                 </CustomFormControl>
                 <FormGroup>
