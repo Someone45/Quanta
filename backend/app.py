@@ -29,7 +29,7 @@ def get_user_voice_model(discord_id: str) -> str | None:
     return get_models().get(discord_id)
 
 def set_user_voice_model(discord_id: str, eleven_labs_model: str):
-    JSON_PATH.write_text(json.dumps(get_models().update({discord_id: eleven_labs_model})))
+    JSON_PATH.write_text(json.dumps({**get_models(), discord_id: eleven_labs_model}))
 
 @app.route('/')
 def hello_world():  # put application's code here
