@@ -23,7 +23,7 @@ LABS_TOKEN = os.getenv('LABS_TOKEN')
 JSON_PATH = Path("eleven_labs_models.json") # Maps from Discord id to Eleven labs model name
 
 def get_models() -> dict[str, str]:
-    return json.loads(JSON_PATH.read_text())
+    return json.loads(JSON_PATH.read_text()) if JSON_PATH.exists() else {}
 
 def get_user_voice_model(discord_id: str) -> str | None:
     return get_models().get(discord_id)
