@@ -213,7 +213,10 @@ export default function NewPage() {
             // Map channels and names
             const channels = Object.entries(data).map(([id, name]) => ({ id, name }));
             setChannels(channels);
-            setChannel(channels[0].id);
+            handleChannelChange(channels[0].id);
+
+            console.log(`Channel: ${JSON.stringify(channels[0])}`);
+            console.log(`Channel ID: ${channels[0].id}`)
         }
         )
     }, [server])
@@ -360,23 +363,29 @@ export default function NewPage() {
     }, [isFilterEnabled]); // Dependency array to re-run useEffect if isFilterEnabled changes
 
 
-    const handleChannelChange = (event) => {
+    const handleChannelChange = (input) => {
+        // Determine whether the input is an event or a direct value
+        const channelId = input.target ? input.target.value : input;
+
         fetch('http://127.0.0.1:5000/get-users-list', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token: token.current, channel: event.target.value, guild: server})
+            body: JSON.stringify({ token: token.current, channel: channelId, guild: server})
         })
             .then(response => response.json())
             .then(data => {
-                console.log("Data.users: ", data.members)
+                console.log("Data.users: ", data.members);
                 setTempUserList(data.members);
             })
             .catch(error => console.error('Error fetching user-info:', error));
-        setChannel(event.target.value);
 
+        // Update the channel state with the channelId
+        setChannel(channelId);
+        console.log(`Channel changed to: ${channelId}`);
     };
+
 
     // Need to implement a function that handles file deletes that are in the server
 
