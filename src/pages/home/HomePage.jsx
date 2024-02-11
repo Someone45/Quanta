@@ -62,8 +62,10 @@ const ProfileSection = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '30%',
+    width: '20%',
+    marginTop: '20px', // Corrected syntax
 });
+
 
 const FormSection = styled(Box)({
     transform: 'translateX(-80px)', // Adjust the pixel value as needed to move to the left
@@ -155,6 +157,7 @@ export default function NewPage() {
         <PageContainer>
         <LogoImage src={logo} alt="Logo" />
             <ProfileSection>
+                {/* U should be set to the userID photo*/}
                 <Avatar sx={{ width: 56, height: 56, marginBottom: 2 }}>U</Avatar>
                 <Typography variant="h6">userID</Typography>
             </ProfileSection>
