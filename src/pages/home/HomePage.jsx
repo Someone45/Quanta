@@ -342,7 +342,7 @@ export default function NewPage() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token: token.current, channel: event.target.value }),
+            body: JSON.stringify({ token: token.current, channel: event.target.value, guild: server})
         })
             .then(response => response.json())
             .then(data => {
@@ -473,11 +473,17 @@ export default function NewPage() {
                     </CustomTabs>
                     {activeTab === 0 && (
                         <Box>
-                            {/*<TextField id="outlined-basic" onChange={handleSpeakerIdChange} label="Friend ID" variant="outlined" />*/}
                             <Autocomplete
                                 disablePortal
                                 id="combo-box-demo"
-                                options={["The Shawshanke Redemption", "The Godfather", "The Dark Knight", "12 Angry"]}
+                                options={tempUserList}
+                                getOptionLabel={(option) => option.username} // Use the username as the label for each option
+                                renderOption={(props, option) => (
+                                    <Box component="li" {...props}>
+                                        <Avatar src={option.avatar} sx={{ width: 24, height: 24, marginRight: 2 }} />
+                                        {option.username}
+                                    </Box>
+                                )}
                                 sx={{ width: 300 }}
                                 renderInput={(params) => <TextField {...params} label="Friend ID" />}
                             />

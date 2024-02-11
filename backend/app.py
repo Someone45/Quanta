@@ -279,6 +279,7 @@ def get_server_icon(size=256):
     except Exception as e:
         print(e)
 
+
 @app.route('/get-users-list', methods=['POST'])
 def get_users_list():
     try:
@@ -287,13 +288,28 @@ def get_users_list():
         channel_id = data['channel']
         guild_id = data['guild']
         members = requests.get(f'https://discord.com/api/v9/channels/{channel_id}/messages?limit=50',
-                                  headers={"Authorization": f"{token}"}).json()
-        # Extract member IDs, usernames, and avatars
-        member_list = [{'id': member['author']['id'], 'username': member['author']['username'], 'avatar': member['author']['avatar']} for member in members]
+                               headers={"Authorization": f"{token}"}).json()
+
+        print(members)
+        # Use a dictionary to keep track of unique members
+        unique_members = {}
+        for member in members:
+            member_id = member['author']['id']
+            if member_id not in unique_members:
+                unique_members[member_id] = {
+                    'id': member_id,
+                    'username': member['author']['username'],
+                    'avatar': f"https://cdn.discordapp.com/avatars/{member_id}/{member['author']['avatar']}.webp?size=16" if
+                    member['author'].get('avatar') else None
+                }
+
+        # Convert the dictionary back to a list for the response
+        member_list = list(unique_members.values())
         return jsonify({'members': member_list}), 200
     except Exception as e:
         print(e)
         return jsonify({'error': 'Error fetching users'}), 400
+
 
 if __name__ == '__main__':
     app.run(debug=True)
